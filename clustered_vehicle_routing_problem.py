@@ -44,66 +44,89 @@ def read_input_cvrp(filename):
       - GVRP_SET_SECTION: for each cluster, a list of node indices (ending with -1)
       - DEMAND_SECTION: for each cluster, its demand
     """
-    tokens = read_elem(filename)
-    it = iter(tokens)
+    lines = read_elem(filename)
+    # Process header: look for keywords.
     nb_nodes = 0
     nb_trucks = 0
     nb_clusters = 0
     truck_capacity = 0
-    # Read header tokens until NODE_COORD_SECTION is found.
-    while True:
-        token = next(it)
-        if token == "DIMENSION:":
-            nb_nodes = int(next(it))
-            nb_customers = nb_nodes - 1  # excluding depot
-        elif token == "VEHICLES:":
-            nb_trucks = int(next(it))
-        elif token == "GVRP_SETS:":
-            nb_clusters = int(next(it))
-        elif token == "CAPACITY:":
-            truck_capacity = int(next(it))
-        elif token == "NODE_COORD_SECTION":
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("DIMENSION:"):
+            parts = line.split(":")
+            nb_nodes = int(parts[1].strip())
+            nb_customers = nb_nodes - 1
+        elif line.startswith("VEHICLES:"):
+            parts = line.split(":")
+            nb_trucks = int(parts[1].strip())
+        elif line.startswith("GVRP_SETS:"):
+            parts = line.split(":")
+            nb_clusters = int(parts[1].strip())
+        elif line.startswith("CAPACITY:"):
+            parts = line.split(":")
+            truck_capacity = int(parts[1].strip())
+        elif line.startswith("NODE_COORD_SECTION"):
+            i += 1
             break
-    # Read node coordinates: node 1 is depot; nodes 2..nb_nodes are customers.
+        i += 1
+
+    # Read node coordinates.
     depot_x = depot_y = 0
     customers_x = []
     customers_y = []
     for n in range(nb_nodes):
-        node_id = int(next(it))
-        x = float(next(it))
-        y = float(next(it))
+        parts = lines[i].split()
+        node_id = int(parts[0])
+        x = float(parts[1])
+        y = float(parts[2])
         if node_id == 1:
             depot_x, depot_y = x, y
         else:
             customers_x.append(x)
             customers_y.append(y)
+        i += 1
     dist_matrix = compute_distance_matrix(customers_x, customers_y)
     dist_depot = compute_distance_depot(depot_x, depot_y, customers_x, customers_y)
-    # Next token should be GVRP_SET_SECTION.
-    token = next(it)
-    print("DEBUG: token =", repr(token))
-    if token != "GVRP_SET_SECTION":
+    
+    # Skip lines until we find "GVRP_SET_SECTION".
+    while i < len(lines) and not lines[i].startswith("GVRP_SET_SECTION"):
+        i += 1
+    if i >= len(lines):
         print("Expected token GVRP_SET_SECTION")
         sys.exit(1)
-    clusters_data = [None] * nb_clusters
+    i += 1  # skip "GVRP_SET_SECTION" line
+
+    clusters_data = []
     for c in range(nb_clusters):
-        cluster_id = int(next(it))
+        parts = lines[i].split()
+        # First token is the cluster id; the rest are customer indices until -1.
         cluster = []
-        val = int(next(it))
-        while val != -1:
-            # Original customer indices are in 2..nb_nodes; convert to 0-indexed.
-            cluster.append(val - 2)
-            val = int(next(it))
-        clusters_data[c] = cluster
-    token = next(it)
-    if token != "DEMAND_SECTION":
+        for token in parts[1:]:
+            if token == "-1":
+                break
+            # Shift customer indices: file indices 2..n become 0-indexed.
+            cluster.append(int(token) - 2)
+        clusters_data.append(cluster)
+        i += 1
+
+    # Skip lines until we find "DEMAND_SECTION".
+    while i < len(lines) and not lines[i].startswith("DEMAND_SECTION"):
+        i += 1
+    if i >= len(lines):
         print("Expected token DEMAND_SECTION")
         sys.exit(1)
-    demands = [None] * nb_clusters
+    i += 1  # skip "DEMAND_SECTION" line
+
+    demands = []
     for c in range(nb_clusters):
-        cluster_id = int(next(it))
-        demands[c] = int(next(it))
+        parts = lines[i].split()
+        # First token is cluster id, second is demand.
+        demands.append(int(parts[1]))
+        i += 1
+
     return nb_customers, nb_trucks, nb_clusters, truck_capacity, dist_matrix, dist_depot, demands, clusters_data
+
 
 class ClusteredVehicleRoutingProblem(BaseProblem):
     """
