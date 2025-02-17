@@ -1,0 +1,44 @@
+{
+    "entry_point": "clustered_vehicle_routing_problem:ClusteredVehicleRoutingProblem",
+    "default_params": {
+      "instance_file": "instances/A-n32-k5-C11-V2.gvrp"
+    },
+    "problem_type": "ClusteredVehicleRouting",
+    "description": "In the clustered vehicle routing problem (cluVRP), a fleet of vehicles with uniform capacity must service clusters of customers. Each cluster (composed of nearby customers) must be served entirely by a single vehicle. The objective is to assign a sequence of clusters to each vehicle (and determine the order in which customers are visited within each cluster) so as to minimize the total distance traveled while ensuring that the demand served by each vehicle does not exceed its capacity.",
+    "keywords": [
+      "clustered vehicle routing",
+      "GVRP",
+      "vehicle routing",
+      "TSPLib",
+      "optimization"
+    ],
+    "data_format": {
+      "instance_file": {
+        "format": "The instance file follows a TSPLib-like format. It includes keywords such as DIMENSION, VEHICLES, GVRP_SETS, CAPACITY, NODE_COORD_SECTION, GVRP_SET_SECTION, DEMAND_SECTION. Node coordinates are given for all nodes (with node 1 as depot), clusters (sets of customers) are listed in GVRP_SET_SECTION, and cluster demands are given in DEMAND_SECTION."
+      }
+    },
+    "decision_variables": {
+      "truckSequences": {
+        "type": "list of lists of int",
+        "description": "A list (one per vehicle) where each inner list is a sequence of cluster indices (0-indexed) assigned to that vehicle. Together, these lists form a partition of {0, ..., nb_clusters-1}."
+      },
+      "clustersSequences": {
+        "type": "list of lists of int",
+        "description": "A list (one per cluster) where each inner list is a permutation of indices from 0 to (number of customers in that cluster - 1) that determines the visitation order within that cluster."
+      }
+    },
+    "objective": {
+      "type": "minimization",
+      "function": "Total distance traveled",
+      "description": "Minimize the sum over all vehicles of the route distances. For each vehicle, the route distance is computed as the distance from the depot to the first cluster's starting customer, plus the intra-cluster distances, plus the inter-cluster distances between consecutive clusters, plus the distance from the last cluster's ending customer back to the depot. Each vehicle’s route must also satisfy the capacity constraint (total demand of visited clusters ≤ truck capacity)."
+    },
+    "solution_representation": "A dictionary with keys 'truckSequences' (a list of lists of cluster indices, one per vehicle) and 'clustersSequences' (a list of lists of integers representing the order of customers within each cluster).",
+    "compatible_optimizers": [
+      "genetic_algorithm",
+      "simulated_annealing",
+      "particle_swarm",
+      "tabu_search"
+    ],
+    "notes": "The instance files are based on TSPLib and the GVRP format. All customer indices are shifted so that the depot is excluded (customers are 0-indexed)."
+  }
+  
