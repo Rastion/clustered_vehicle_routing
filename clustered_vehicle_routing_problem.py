@@ -81,6 +81,7 @@ def read_input_cvrp(filename):
     dist_depot = compute_distance_depot(depot_x, depot_y, customers_x, customers_y)
     # Next token should be GVRP_SET_SECTION.
     token = next(it)
+    print("DEBUG: token =", repr(token))
     if token != "GVRP_SET_SECTION":
         print("Expected token GVRP_SET_SECTION")
         sys.exit(1)
