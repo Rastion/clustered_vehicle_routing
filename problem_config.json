@@ -3,15 +3,9 @@
     "default_params": {
       "instance_file": "instances/A-n32-k5-C11-V2.gvrp"
     },
-    "problem_type": "ClusteredVehicleRouting",
+    "problem_type": "Clustered Vehicle Routing Problem",
     "description": "In the clustered vehicle routing problem (cluVRP), a fleet of vehicles with uniform capacity must service clusters of customers. Each cluster (composed of nearby customers) must be served entirely by a single vehicle. The objective is to assign a sequence of clusters to each vehicle (and determine the order in which customers are visited within each cluster) so as to minimize the total distance traveled while ensuring that the demand served by each vehicle does not exceed its capacity.",
-    "keywords": [
-      "clustered vehicle routing",
-      "GVRP",
-      "vehicle routing",
-      "TSPLib",
-      "optimization"
-    ],
+    "keywords": ["vehicle routing", "clustered", "routing", "combinatorial", "graph", "logistics", "optimization"],
     "data_format": {
       "instance_file": {
         "format": "The instance file follows a TSPLib-like format. It includes keywords such as DIMENSION, VEHICLES, GVRP_SETS, CAPACITY, NODE_COORD_SECTION, GVRP_SET_SECTION, DEMAND_SECTION. Node coordinates are given for all nodes (with node 1 as depot), clusters (sets of customers) are listed in GVRP_SET_SECTION, and cluster demands are given in DEMAND_SECTION."
