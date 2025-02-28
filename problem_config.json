@@ -3,9 +3,18 @@
     "default_params": {
       "instance_file": "instances/A-n32-k5-C11-V2.gvrp"
     },
-    "problem_type": "Clustered Vehicle Routing Problem",
+    "creator": "Rastion",
+    "type": "problem",
+    "problem_name": "Clustered vehicle routing problem",
     "description": "In the clustered vehicle routing problem (cluVRP), a fleet of vehicles with uniform capacity must service clusters of customers. Each cluster (composed of nearby customers) must be served entirely by a single vehicle. The objective is to assign a sequence of clusters to each vehicle (and determine the order in which customers are visited within each cluster) so as to minimize the total distance traveled while ensuring that the demand served by each vehicle does not exceed its capacity.",
-    "keywords": ["vehicle routing", "clustered", "routing", "combinatorial", "graph", "logistics", "optimization"],
+    "link_to_dataset": "https://github.com/Rastion/clustered_vehicle_routing/blob/main/instances/A-n32-k5-C11-V2.gvrp",
+    "keywords": [
+      "clustered vehicle routing",
+      "GVRP",
+      "vehicle routing",
+      "TSPLib",
+      "route-optimization"
+    ],
     "data_format": {
       "instance_file": {
         "format": "The instance file follows a TSPLib-like format. It includes keywords such as DIMENSION, VEHICLES, GVRP_SETS, CAPACITY, NODE_COORD_SECTION, GVRP_SET_SECTION, DEMAND_SECTION. Node coordinates are given for all nodes (with node 1 as depot), clusters (sets of customers) are listed in GVRP_SET_SECTION, and cluster demands are given in DEMAND_SECTION."
@@ -27,11 +36,8 @@
       "description": "Minimize the sum over all vehicles of the route distances. For each vehicle, the route distance is computed as the distance from the depot to the first cluster's starting customer, plus the intra-cluster distances, plus the inter-cluster distances between consecutive clusters, plus the distance from the last cluster's ending customer back to the depot. Each vehicle’s route must also satisfy the capacity constraint (total demand of visited clusters ≤ truck capacity)."
     },
     "solution_representation": "A dictionary with keys 'truckSequences' (a list of lists of cluster indices, one per vehicle) and 'clustersSequences' (a list of lists of integers representing the order of customers within each cluster).",
-    "compatible_optimizers": [
-      "genetic_algorithm",
-      "simulated_annealing",
-      "particle_swarm",
-      "tabu_search"
+    "formulations": [
+      ""
     ],
     "notes": "The instance files are based on TSPLib and the GVRP format. All customer indices are shifted so that the depot is excluded (customers are 0-indexed)."
   }
